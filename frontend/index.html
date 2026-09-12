@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Tutor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  .fade-in { animation: fadeIn 0.3s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<div id="app"></div>
+
+<script>
+const API_URL = "http://127.0.0.1:8000";
+
+let state = {
+  token: localStorage.getItem("token") || null,
+  user: null,
+  documents: [],
+  activeDocument: null,
+  sessions: [],
+  activeSession: null,
+  messages: [],
+  view: "login", // login | signup | dashboard
+  loading: false,
+};
+
+function setState(newState) {
+  state = { ...state, ...newState };
+  render();
+}
+
+// ---------- API HELPERS ----------
+
+async function apiFetch(path, options = {}) {
+  const headers = options.headers || {};
+  if (state.token) headers["Authorization"] = `Bearer ${state.token}`;
+  if (!(options.body instanceof FormData)) headers["Content-Type"] = "application/json";
+
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Something went wrong" }));
+    throw new Error(err.detail || "Request failed");
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+// ---------- AUTH ACTIONS ----------
+
+async function handleSignup(email, password) {
+  try {
+    setState({ loading: true });
+    await apiFetch("/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    await handleLogin(email, password);
+  } catch (e) {
+    setState({ loading: false });
+    alert(e.message);
+  }
+}
+
+async function handleLogin(email, password) {
+  try {
+    setState({ loading: true });
+    const data = await apiFetch("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    localStorage.setItem("token", data.access_token);
+    setState({ token: data.access_token, loading: false });
+    await loadDashboard();
+  } catch (e) {
+    setState({ loading: false });
+    alert(e.message);
+  }
+}
+
+function handleLogout() {
+  localStorage.removeItem("token");
+  setState({
+    token: null, user: null, documents: [], activeDocument: null,
+    sessions: [], activeSession: null, messages: [], view: "login",
+  });
+}
+
+// ---------- DASHBOARD ACTIONS ----------
+
+async function loadDashboard() {
+  try {
+    const user = await apiFetch("/auth/me");
+    const documents = await apiFetch("/documents/");
+    setState({ user, documents, view: "dashboard" });
+  } catch (e) {
+    handleLogout();
+  }
+}
+
+async function handleUpload(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  try {
+    setState({ loading: true });
+    await apiFetch("/documents/upload", { method: "POST", body: formData });
+    const documents = await apiFetch("/documents/");
+    setState({ documents, loading: false });
+  } catch (e) {
+    setState({ loading: false });
+    alert(e.message);
+  }
+}
+
+async function handleDeleteDocument(docId) {
+  if (!confirm("Delete this document and all its chats?")) return;
+  try {
+    await apiFetch(`/documents/${docId}`, { method: "DELETE" });
+    const documents = await apiFetch("/documents/");
+    let reset = {};
+    if (state.activeDocument?.id === docId) {
+      reset = { activeDocument: null, sessions: [], activeSession: null, messages: [] };
+    }
+    setState({ documents, ...reset });
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function openDocument(doc) {
+  const sessions = await apiFetch(`/chat/sessions/${doc.id}`);
+  setState({ activeDocument: doc, sessions, activeSession: null, messages: [] });
+}
+
+async function createSession(docId) {
+  const title = prompt("Name this chat:", "New Chat") || "New Chat";
+  try {
+    const session = await apiFetch("/chat/sessions", {
+      method: "POST",
+      body: JSON.stringify({ document_id: docId, title }),
+    });
+    const sessions = await apiFetch(`/chat/sessions/${docId}`);
+    setState({ sessions });
+    openSession(session);
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function openSession(session) {
+  const messages = await apiFetch(`/chat/sessions/${session.id}/messages`);
+  setState({ activeSession: session, messages });
+}
+
+async function sendQuestion(question) {
+  if (!question.trim()) return;
+  const tempMessages = [...state.messages, { id: "temp", question, answer: null, sources: null, pending: true }];
+  setState({ messages: tempMessages, loading: true });
+  try {
+    const message = await apiFetch("/chat/ask", {
+      method: "POST",
+      body: JSON.stringify({ session_id: state.activeSession.id, question }),
+    });
+    const messages = await apiFetch(`/chat/sessions/${state.activeSession.id}/messages`);
+    setState({ messages, loading: false });
+  } catch (e) {
+    setState({ loading: false, messages: state.messages.filter(m => m.id !== "temp") });
+    alert(e.message);
+  }
+}
+
+// ---------- RENDER FUNCTIONS ----------
+
+function render() {
+  const app = document.getElementById("app");
+  if (state.view === "login") app.innerHTML = renderAuth("login");
+  else if (state.view === "signup") app.innerHTML = renderAuth("signup");
+  else app.innerHTML = renderDashboard();
+  attachEvents();
+}
+
+function renderAuth(mode) {
+  const isLogin = mode === "login";
+  return `
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-indigo-500 to-purple-600 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 fade-in">
+      <div class="text-center mb-8">
+        <div class="w-14 h-14 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">AI</div>
+        <h1 class="text-2xl font-bold text-slate-800">AI-Tutor</h1>
+        <p class="text-slate-500 text-sm mt-1">Chat with your documents, backed by citations</p>
+      </div>
+      <form id="auth-form" class="space-y-4">
+        <div>
+          <label class="text-sm font-medium text-slate-600">Email</label>
+          <input required type="email" id="email" class="mt-1 w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="you@example.com">
+        </div>
+        <div>
+          <label class="text-sm font-medium text-slate-600">Password</label>
+          <input required type="password" id="password" class="mt-1 w-full border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition ${state.loading ? "opacity-60 pointer-events-none" : ""}">
+          ${state.loading ? "Please wait..." : (isLogin ? "Log In" : "Sign Up")}
+        </button>
+      </form>
+      <p class="text-center text-sm text-slate-500 mt-6">
+        ${isLogin ? "Don't have an account?" : "Already have an account?"}
+        <a href="#" id="switch-view" class="text-indigo-600 font-medium hover:underline">${isLogin ? "Sign up" : "Log in"}</a>
+      </p>
+    </div>
+  </div>`;
+}
+
+function renderDashboard() {
+  return `
+  <div class="flex h-screen">
+    <!-- Sidebar: Documents -->
+    <div class="w-72 bg-white border-r border-slate-200 flex flex-col">
+      <div class="p-4 border-b border-slate-200">
+        <div class="flex items-center justify-between mb-1">
+          <h2 class="font-bold text-lg text-slate-800">📚 AI-Tutor</h2>
+          <button id="logout-btn" class="text-xs text-slate-400 hover:text-red-500">Logout</button>
+        </div>
+        <p class="text-xs text-slate-400 truncate">${state.user?.email || ""}</p>
+      </div>
+
+      <div class="p-3">
+        <label class="block">
+          <input type="file" id="upload-input" accept=".pdf,.docx,.txt" class="hidden">
+          <div class="cursor-pointer bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium rounded-lg py-2.5 text-center transition" id="upload-btn">
+            ${state.loading ? "Processing..." : "+ Upload Document"}
+          </div>
+        </label>
+      </div>
+
+      <div class="flex-1 overflow-y-auto scrollbar-thin px-3 space-y-1">
+        ${state.documents.map(doc => `
+          <div class="group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-sm ${state.activeDocument?.id === doc.id ? "bg-indigo-600 text-white" : "hover:bg-slate-100 text-slate-700"}" data-doc-id="${doc.id}">
+            <span class="truncate flex-1 doc-select">📄 ${doc.filename}</span>
+            <button class="delete-doc opacity-0 group-hover:opacity-100 text-xs ml-2 ${state.activeDocument?.id === doc.id ? "text-indigo-200 hover:text-white" : "text-slate-400 hover:text-red-500"}" data-doc-id="${doc.id}">✕</button>
+          </div>
+        `).join("") || `<p class="text-xs text-slate-400 text-center mt-6">No documents yet</p>`}
+      </div>
+    </div>
+
+    <!-- Sidebar: Chat Sessions -->
+    ${state.activeDocument ? `
+    <div class="w-64 bg-slate-50 border-r border-slate-200 flex flex-col">
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="font-semibold text-sm text-slate-700 truncate">${state.activeDocument.filename}</h3>
+      </div>
+      <div class="p-3">
+        <button id="new-chat-btn" class="w-full bg-white border border-slate-200 hover:border-indigo-400 text-slate-700 text-sm font-medium rounded-lg py-2 transition">+ New Chat</button>
+      </div>
+      <div class="flex-1 overflow-y-auto scrollbar-thin px-3 space-y-1">
+        ${state.sessions.map(s => `
+          <div class="session-select px-3 py-2 rounded-lg cursor-pointer text-sm truncate ${state.activeSession?.id === s.id ? "bg-indigo-100 text-indigo-800 font-medium" : "hover:bg-slate-200 text-slate-600"}" data-session-id="${s.id}">
+            💬 ${s.title}
+          </div>
+        `).join("") || `<p class="text-xs text-slate-400 text-center mt-6">No chats yet</p>`}
+      </div>
+    </div>` : ""}
+
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col bg-slate-50">
+      ${!state.activeSession ? `
+        <div class="flex-1 flex items-center justify-center text-center px-6">
+          <div>
+            <div class="text-5xl mb-4">🤖</div>
+            <h2 class="text-xl font-semibold text-slate-700">${state.activeDocument ? "Select or start a chat" : "Select a document to begin"}</h2>
+            <p class="text-slate-400 text-sm mt-2">Upload a document, then start asking questions about it.</p>
+          </div>
+        </div>
+      ` : `
+        <div class="flex-1 overflow-y-auto scrollbar-thin p-6 space-y-6" id="messages-container">
+          ${state.messages.map(renderMessage).join("")}
+        </div>
+        <div class="p-4 border-t border-slate-200 bg-white">
+          <form id="ask-form" class="flex gap-3 max-w-3xl mx-auto">
+            <input id="question-input" type="text" placeholder="Ask a question about this document..." autocomplete="off"
+              class="flex-1 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" ${state.loading ? "disabled" : ""}>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 rounded-xl font-medium text-sm transition ${state.loading ? "opacity-60 pointer-events-none" : ""}">
+              ${state.loading ? "..." : "Send"}
+            </button>
+          </form>
+        </div>
+      `}
+    </div>
+  </div>`;
+}
+
+function renderMessage(m) {
+  return `
+  <div class="max-w-3xl mx-auto space-y-3 fade-in">
+    <div class="flex justify-end">
+      <div class="bg-indigo-600 text-white px-4 py-2.5 rounded-2xl rounded-br-sm max-w-lg text-sm">${escapeHtml(m.question)}</div>
+    </div>
+    ${m.pending ? `
+      <div class="flex justify-start">
+        <div class="bg-white border border-slate-200 px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm text-slate-400">Thinking...</div>
+      </div>
+    ` : `
+      <div class="flex justify-start">
+        <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-bl-sm max-w-lg text-sm text-slate-700 leading-relaxed">
+          ${escapeHtml(m.answer)}
+        </div>
+      </div>
+    `}
+  </div>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+
+// ---------- EVENT WIRING ----------
+
+function attachEvents() {
+  const authForm = document.getElementById("auth-form");
+  if (authForm) {
+    authForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      if (state.view === "login") handleLogin(email, password);
+      else handleSignup(email, password);
+    });
+  }
+
+  const switchView = document.getElementById("switch-view");
+  if (switchView) {
+    switchView.addEventListener("click", (e) => {
+      e.preventDefault();
+      setState({ view: state.view === "login" ? "signup" : "login" });
+    });
+  }
+
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) logoutBtn.addEventListener("click", handleLogout);
+
+  const uploadInput = document.getElementById("upload-input");
+  if (uploadInput) {
+    uploadInput.addEventListener("change", (e) => {
+      if (e.target.files[0]) handleUpload(e.target.files[0]);
+    });
+  }
+
+  document.querySelectorAll(".doc-select").forEach(el => {
+    el.addEventListener("click", () => {
+      const docId = parseInt(el.closest("[data-doc-id]").dataset.docId);
+      const doc = state.documents.find(d => d.id === docId);
+      openDocument(doc);
+    });
+  });
+
+  document.querySelectorAll(".delete-doc").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      handleDeleteDocument(parseInt(el.dataset.docId));
+    });
+  });
+
+  const newChatBtn = document.getElementById("new-chat-btn");
+  if (newChatBtn) newChatBtn.addEventListener("click", () => createSession(state.activeDocument.id));
+
+  document.querySelectorAll(".session-select").forEach(el => {
+    el.addEventListener("click", () => {
+      const sessionId = parseInt(el.dataset.sessionId);
+      const session = state.sessions.find(s => s.id === sessionId);
+      openSession(session);
+    });
+  });
+
+  const askForm = document.getElementById("ask-form");
+  if (askForm) {
+    askForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("question-input");
+      const question = input.value;
+      input.value = "";
+      sendQuestion(question);
+    });
+  }
+
+  const container = document.getElementById("messages-container");
+  if (container) container.scrollTop = container.scrollHeight;
+}
+
+// ---------- INIT ----------
+
+if (state.token) {
+  loadDashboard();
+} else {
+  render();
+}
+</script>
+</body>
+</html>
