@@ -70,11 +70,13 @@ Saved to PostgreSQL chat history → returned to user
 ## 📸 Screenshots
 
 
+### Login Page
 
-```
 ![Login](screenshots/login.png)
+
+### Chat Page
 ![Chat](screenshots/chat.png)
-```
+
 
 ---
 
