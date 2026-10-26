@@ -37,3 +37,6 @@ openai
 pytest
 httpx
 ruff
+
+# Testing Files 
+reportlab
