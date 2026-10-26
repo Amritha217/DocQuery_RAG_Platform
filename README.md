@@ -1,185 +1,149 @@
-# DocQuery — Retrieval-Augmented Document Q&A Platform
+# DocQuery — RAG-Based Document Q&A Platform
 
-A Retrieval-Augmented Generation (RAG) platform that lets users upload their own documents (PDF, DOCX, TXT) and ask natural-language questions about them — with answers grounded strictly in the uploaded content, not the LLM's general knowledge.
+DocQuery is a document question-answering platform built using Retrieval-Augmented Generation (RAG). Users can upload PDF, DOCX, and TXT files and ask questions about their content. The system retrieves relevant information from the uploaded documents and uses it to generate answers.
 
-Built to explore production-style RAG architecture: hybrid retrieval, re-ranking, confidence-gated generation, and multi-user isolation — not just a single-file notebook demo.
-
----
+The goal of this project is to explore how RAG works in a practical application, from document processing and retrieval to API development, authentication, and automated testing.
 
 ## ✨ Features
 
-- 🔐 **JWT Authentication** — secure signup/login, every request scoped to the authenticated user
-- 📄 **Multi-document upload** — supports PDF, DOCX, and TXT, with per-user isolated storage
-- 🔍 **Hybrid Retrieval Pipeline** — combines FAISS dense vector search (semantic meaning) with BM25 keyword search (exact term matching)
-- 🎯 **Cross-Encoder Re-ranking** — a second-pass model re-scores top candidates for higher precision before generation
-- 🚫 **Confidence-gated responses** — the system explicitly refuses to answer when retrieved context is insufficient, instead of hallucinating
-- 💬 **Persistent chat sessions** — ChatGPT-style chat threads per document, full history saved per user
-- ⚡ **Groq API** — fast, low-latency LLM inference (Llama 3.3, free tier)
-- 🐳 **Dockerized** — one-command deployment of the full stack (API + PostgreSQL)
-
----
+- 🔐 JWT-based user authentication
+- 📄 Upload and manage PDF, DOCX, and TXT documents
+- 🔍 Hybrid search using FAISS and BM25
+- 🎯 Cross-encoder reranking for more relevant results
+- 🤖 Context-based answer generation using the Groq API
+- 💬 Persistent chat sessions and conversation history
+- 🗄️ PostgreSQL database with SQLAlchemy
+- 🐳 Docker and Docker Compose support
+- 🧪 Automated tests using pytest
+- 🔄 GitHub Actions CI with Ruff and pytest
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
+| Component | Technology |
 |---|---|
-| Backend Framework | FastAPI |
-| Database | PostgreSQL + SQLAlchemy ORM |
-| Authentication | JWT (python-jose), bcrypt password hashing |
-| Vector Search | FAISS (sentence-transformers embeddings) |
-| Keyword Search | BM25 (rank-bm25) |
-| Re-ranking | Cross-Encoder (sentence-transformers) |
-| LLM Inference | Groq API (Llama 3.3 70B) |
-| Frontend | HTML + Tailwind CSS + Vanilla JavaScript |
-| Deployment | Docker + Docker Compose |
+| Backend | FastAPI, Python |
+| Database | PostgreSQL, SQLAlchemy |
+| Authentication | JWT, bcrypt |
+| Embeddings | Sentence Transformers |
+| Retrieval | FAISS, BM25 |
+| Reranking | Cross-Encoder |
+| LLM | Groq API |
+| Testing | pytest, HTTPX |
+| Code Quality | Ruff |
+| Deployment | Docker, Docker Compose |
 
----
+## 🏗️ How It Works
 
-## 🏗️ Architecture
+1. Users upload a document.
+2. The application extracts the text and splits it into chunks.
+3. Embeddings and keyword indexes are created for retrieval.
+4. When a user asks a question, FAISS and BM25 retrieve relevant chunks.
+5. A cross-encoder reranks the results.
+6. The retrieved context is passed to the LLM to generate an answer.
+7. Chat history is saved in the database.
 
-```
-User uploads document (PDF/DOCX/TXT)
-        │
-        ▼
-Text extraction → Chunking (page-aware)
-        │
-        ▼
-Embeddings generated → stored in FAISS + BM25 index
-        │
-        ▼
-User asks a question (within a chat session)
-        │
-        ▼
-Hybrid Search (FAISS + BM25) → top candidates
-        │
-        ▼
-Cross-Encoder Re-ranking → best chunks selected
-        │
-        ▼
-Confidence check → insufficient? return "I don't know"
-        │                              │
-        ▼                              
-Groq LLM generates grounded answer
-        │
-        ▼
-Saved to PostgreSQL chat history → returned to user
-```
-
----
-
-## 📸 Screenshots
-
-
-### Login Page
-
-![Login](screenshots/login.png)
-
-### Chat Page
-![Chat](screenshots/chat.png)
-
-
----
+The system is designed to avoid unsupported answers when the retrieved context is insufficient.
 
 ## 🚀 Getting Started
 
-### Option 1: Run with Docker (recommended)
+### Prerequisites
 
-**Prerequisites:** Docker Desktop installed, a free [Groq API key](https://console.groq.com)
+- Python 3.12
+- Docker Desktop (for Docker setup)
+- A Groq API key from the [Groq Console](https://console.groq.com/)
 
-1. Clone the repository
+### Run with Docker
+
+Clone the repository:
+
 ```bash
-git clone https://github.com/YOUR_USERNAME/ai-tutor-rag-platform.git
-cd ai-tutor-rag-platform
+git clone https://github.com/Amritha217/DocQuery_RAG_Platform.git
+cd DocQuery_RAG_Platform
 ```
 
-2. Create a `.env` file in the project root:
-```
-DATABASE_URL=postgresql://postgres:postgres@db:5432/ai_tutor_db
-SECRET_KEY=your_random_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=10080
-GROQ_API_KEY=your_groq_api_key
-GROQ_MODEL=llama-3.3-70b-versatile
-```
+Create a `.env` file in the project root with the environment variables required by your Docker configuration, including your database URL, secret key, and Groq API key.
 
-3. Run everything with one command:
+Then start the application:
+
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
-4. Open the API docs: `http://127.0.0.1:8000/docs`
-5. Open `frontend/index.html` in your browser to use the UI
+Once the application is running, open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) to explore the API.
 
----
+### Run Locally
 
-### Option 2: Run locally (without Docker)
+Create and activate a virtual environment, then install the dependencies:
 
-**Prerequisites:** Python 3.11+, PostgreSQL installed locally
-
-1. Clone the repo and create a virtual environment
 ```bash
-git clone https://github.com/YOUR_USERNAME/ai-tutor-rag-platform.git
-cd ai-tutor-rag-platform
 python -m venv venv
-venv\Scripts\activate        # Windows
-source venv/bin/activate     # Mac/Linux
 ```
 
-2. Install dependencies
+Windows:
+
+```powershell
+venv\Scripts\activate
+```
+
+macOS/Linux:
+
+```bash
+source venv/bin/activate
+```
+
+Install dependencies and start the server:
+
 ```bash
 pip install -r requirements.txt
-```
-
-3. Create a PostgreSQL database named `ai_tutor_db`
-
-4. Create a `.env` file (see above), with `DATABASE_URL` pointing to `localhost` instead of `db`:
-```
-DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/ai_tutor_db
-```
-
-5. Create the database tables
-```bash
-python create_tables.py
-```
-
-6. Run the server
-```bash
 uvicorn app.main:app --reload
 ```
 
-7. Open `http://127.0.0.1:8000/docs` or `frontend/index.html`
+Make sure PostgreSQL is running and your `.env` file is configured before starting the application.
 
----
+## 📡 API Endpoints
 
-## 📡 API Overview
-
-| Method | Endpoint | Description |
+| Method | Endpoint | Purpose |
 |---|---|---|
-| POST | `/auth/signup` | Register a new user |
-| POST | `/auth/login` | Log in, receive a JWT token |
-| GET | `/auth/me` | Get current logged-in user info |
-| POST | `/documents/upload` | Upload a document (PDF/DOCX/TXT) |
-| GET | `/documents/` | List current user's documents |
+| POST | `/auth/signup` | Register a user |
+| POST | `/auth/login` | Log in |
+| GET | `/auth/me` | Get current user details |
+| POST | `/documents/upload` | Upload a document |
+| GET | `/documents/` | List documents |
 | DELETE | `/documents/{document_id}` | Delete a document |
-| POST | `/chat/sessions` | Create a new chat session for a document |
-| GET | `/chat/sessions/{document_id}` | List chat sessions for a document |
-| POST | `/chat/ask` | Ask a question within a chat session |
-| GET | `/chat/sessions/{session_id}/messages` | Get full chat history for a session |
+| POST | `/chat/sessions` | Create a chat session |
+| POST | `/chat/ask` | Ask a question |
+| GET | `/chat/sessions/{session_id}/messages` | View chat history |
 
-Full interactive documentation available at `/docs` once running.
+For the complete API documentation, visit `/docs` after starting the server.
 
----
+## 🧪 Testing and CI
+
+The project includes automated tests for document processing, text chunking, FAISS and BM25 retrieval, hybrid search, reranking, and the basic API endpoint.
+
+Run the tests:
+
+```bash
+python -m pytest -v
+```
+
+Run Ruff:
+
+```bash
+python -m ruff check app tests
+```
+
+The last recorded test run had **16 passing tests**. GitHub Actions is configured to run the code-quality checks and tests automatically on pushes and pull requests.
 
 ## 🔮 Future Improvements
 
-- **Multi-document chats** — currently each chat session is scoped to a single document for retrieval accuracy; could be extended with a join table to allow querying across multiple documents in one conversation
-- **Refresh token flow** — currently uses long-lived access tokens; a short-lived access token + refresh token pattern would be more production-appropriate
-- **Streaming responses** — stream LLM output token-by-token instead of waiting for the full response
-- **Support for `.pptx` and legacy `.doc` files**
-- **Migration tooling (Alembic)** instead of manual table recreation during schema changes
-
----
+- Expand test coverage for authentication, document uploads, and chat endpoints
+- Evaluate RAG performance using RAGAS
+- Support multi-document conversations
+- Add streaming responses and OCR for scanned PDFs
+- Introduce Alembic database migrations
 
 ## 👤 Author
 
-Built by [Amritha Dileep Kumar] as a portfolio project demonstrating end-to-end RAG system design, from retrieval engineering to deployment.
+**Amritha Dileep Kumar**
+
+Built as a portfolio project to explore RAG, hybrid retrieval, LLM integration, and backend development.
