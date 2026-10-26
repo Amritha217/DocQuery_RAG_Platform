@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr
-from datetime import datetime
-from typing import Optional
+# Defines the format of data - data the users send and response received.
 
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 # ---------- User Schemas ----------
 
@@ -15,8 +16,9 @@ class UserResponse(BaseModel):
     email: EmailStr
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
+
 
 
 # ---------- Auth / Token Schemas ----------
@@ -33,15 +35,15 @@ class DocumentResponse(BaseModel):
     filename: str
     uploaded_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
 
 
 # ---------- Chat Session Schemas ----------
 
 class ChatSessionCreate(BaseModel):
     document_id: int
-    title: Optional[str] = "New Chat"
+    title: str | None = "New Chat"
 
 
 class ChatSessionResponse(BaseModel):
@@ -50,8 +52,8 @@ class ChatSessionResponse(BaseModel):
     document_id: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
 
 
 # ---------- Chat Message Schemas ----------
@@ -63,16 +65,15 @@ class ChatRequest(BaseModel):
 
 class SourceChunk(BaseModel):
     chunk: str
-    page: Optional[int] = None
+    page: int | None = None
     score: float
 
 class ChatResponse(BaseModel):
     id: int
     question: str
     answer: str
-    sources: Optional[list[SourceChunk]] = None
+    sources: list[SourceChunk] | None = None
     session_id: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

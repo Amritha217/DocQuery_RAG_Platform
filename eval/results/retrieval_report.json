@@ -1,0 +1,314 @@
+{
+  "faiss_only": {
+    "recall_at_5": 0.875,
+    "mrr": 0.6458333333333334,
+    "ndcg_at_5": 0.7072899391816857,
+    "evaluated_questions": 16,
+    "per_question": [
+      {
+        "id": "Q1",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q3",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q4",
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0
+      },
+      {
+        "id": "Q5",
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6934264036172708
+      },
+      {
+        "id": "Q6",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q7",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q8",
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575
+      },
+      {
+        "id": "Q9",
+        "recall_at_5": 1.0,
+        "mrr": 0.25,
+        "ndcg_at_5": 0.43067655807339306
+      },
+      {
+        "id": "Q10",
+        "recall_at_5": 1.0,
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5
+      },
+      {
+        "id": "Q11",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q12",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q13",
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0
+      },
+      {
+        "id": "Q14",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q15",
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575
+      },
+      {
+        "id": "Q16",
+        "recall_at_5": 1.0,
+        "mrr": 0.25,
+        "ndcg_at_5": 0.43067655807339306
+      },
+      {
+        "id": "Q17",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      }
+    ]
+  },
+  "hybrid": {
+    "recall_at_5": 0.875,
+    "mrr": 0.7395833333333334,
+    "ndcg_at_5": 0.7601784347123322,
+    "evaluated_questions": 16,
+    "per_question": [
+      {
+        "id": "Q1",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q3",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q4",
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0
+      },
+      {
+        "id": "Q5",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 0.8503449055347546
+      },
+      {
+        "id": "Q6",
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575
+      },
+      {
+        "id": "Q7",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q8",
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575
+      },
+      {
+        "id": "Q9",
+        "recall_at_5": 1.0,
+        "mrr": 0.3333333333333333,
+        "ndcg_at_5": 0.5
+      },
+      {
+        "id": "Q10",
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575
+      },
+      {
+        "id": "Q11",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 0.9197207891481876
+      },
+      {
+        "id": "Q12",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q13",
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0
+      },
+      {
+        "id": "Q14",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q15",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q16",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q17",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      }
+    ]
+  },
+  "hybrid_reranked": {
+    "recall_at_5": 0.84375,
+    "mrr": 0.79375,
+    "ndcg_at_5": 0.7889098810635533,
+    "evaluated_questions": 16,
+    "per_question": [
+      {
+        "id": "Q1",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q3",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q4",
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0
+      },
+      {
+        "id": "Q5",
+        "recall_at_5": 0.5,
+        "mrr": 0.2,
+        "ndcg_at_5": 0.23719771276929622
+      },
+      {
+        "id": "Q6",
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "ndcg_at_5": 0.6309297535714575
+      },
+      {
+        "id": "Q7",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q8",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q9",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q10",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q11",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 0.8772153153380493
+      },
+      {
+        "id": "Q12",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 0.8772153153380493
+      },
+      {
+        "id": "Q13",
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "ndcg_at_5": 0.0
+      },
+      {
+        "id": "Q14",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q15",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q16",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      },
+      {
+        "id": "Q17",
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "ndcg_at_5": 1.0
+      }
+    ]
+  }
+}

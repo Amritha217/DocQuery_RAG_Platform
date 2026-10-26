@@ -1,8 +1,12 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+# Define the project database structure
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
 from app.database import Base
 
+# 1. Define the users table, which stores information about registered users
 
 class User(Base):
     __tablename__ = "users"
@@ -16,6 +20,8 @@ class User(Base):
     sessions = relationship("ChatSession", back_populates="user")
 
 
+# 2. Define documents table, which stores information about each uploaded document.
+    
 class Document(Base):
     __tablename__ = "documents"
 
@@ -24,11 +30,14 @@ class Document(Base):
     filepath = Column(String, nullable=False)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
+    storage_key = Column(String, nullable=True, unique=True)                   # This supports vector-store folder arrangement
 
     owner = relationship("User", back_populates="documents")
     sessions = relationship("ChatSession", back_populates="document")
 
 
+# 3. Define chat_sessions table, which represents a conversation associated with a user and a document
+    
 class ChatSession(Base):
     __tablename__ = "chat_sessions"
 
@@ -42,7 +51,8 @@ class ChatSession(Base):
     document = relationship("Document", back_populates="sessions")
     messages = relationship("ChatHistory", back_populates="session", cascade="all, delete-orphan")
 
-
+# 4. Define the chat_history table, which stores the questions users ask and the answers the chatbot generates
+    
 class ChatHistory(Base):
     __tablename__ = "chat_history"
 

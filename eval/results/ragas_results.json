@@ -1,0 +1,167 @@
+[
+  {
+    "id": "Q1",
+    "question": "What is Classification in machine learning?",
+    "answerable": true,
+    "generated_answer": "Classification is a type of supervised machine learning problem where the goal is to predict a **class label**—that is, to choose an outcome from a predefined list of possible categories. For example, classifying iris flowers into one of three species or deciding whether an email is spam or not are classification tasks. When there are exactly two possible classes, it’s called **binary classification** (a yes/no question); when there are more than two classes, it’s called **multiclass classification**.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q2",
+    "question": "Who invented the first computer?",
+    "answerable": false,
+    "generated_answer": "I don't have enough information in this document to answer that question.",
+    "retrieved_context_count": 5,
+    "faithfulness": null,
+    "answer_accuracy": null,
+    "abstention_correct": true,
+    "error": null
+  },
+  {
+    "id": "Q3",
+    "question": "Explain the term ensemble.",
+    "answerable": true,
+    "generated_answer": "An **ensemble** is a machine‑learning approach that combines multiple individual models to produce a single, more powerful predictor. By aggregating the predictions of several models—such as the many decision trees in a random forest or the sequential trees in gradient‑boosted decision trees—ensembles can achieve better performance and reduce over‑fitting compared to using a single model alone.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q4",
+    "question": "What is regression in machine learning?",
+    "answerable": true,
+    "generated_answer": "Regression is a type of supervised machine‑learning problem where the goal is to predict a numeric (continuous) outcome from a set of input features. Unlike classification, which predicts a categorical label, regression models learn a function that maps inputs to real‑valued targets.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q5",
+    "question": "What is the difference between classification and regression?",
+    "answerable": true,
+    "generated_answer": "Classification predicts a **discrete class label**—there’s no notion of “in‑between” values (e.g., a website is either English or French).  \nRegression predicts a **continuous numeric value**—the possible outcomes vary smoothly, so small changes in the output are meaningful (e.g., predicting a person’s annual income).  \n\nIn short, classification deals with categorical outcomes, while regression deals with continuous, real‑valued outcomes.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q6",
+    "question": "What is overfitting in a decision tree?",
+    "answerable": true,
+    "generated_answer": "Overfitting in a decision tree happens when the tree is grown until its leaves are pure—i.e., it memorizes every training example. The model then achieves 100 % accuracy on the training set, but it captures noise and outliers, so its decision boundary is overly complex and it performs worse on new, unseen data. In other words, the tree fits the training data too closely and fails to generalize.",
+    "retrieved_context_count": 5,
+    "faithfulness": 0.6666666666666666,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q7",
+    "question": "How does a decision tree make a prediction for a new data point?",
+    "answerable": true,
+    "generated_answer": "A decision‑tree prediction works by **walking down the tree**:\n\n1. **Start at the root node** and evaluate the test (e.g., “x[1] ≤ 0.0596”).  \n2. **Follow the left branch** if the test is true, otherwise follow the right branch.  \n3. **Repeat** this process at each subsequent node until you reach a leaf node.  \n\n- **For classification**, the leaf contains the majority class (or the single class if the leaf is pure), and that class is returned as the prediction.  \n- **For regression**, the leaf stores the mean target value of the training points that fell there, and that mean is returned as the prediction.  \n\nIn short, the tree partitions the feature space; the new point’s location in that partition determines which leaf it lands in, and the leaf’s stored value (majority class or mean target) is the model’s prediction.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q8",
+    "question": "What are two common strategies for preventing overfitting in decision trees?",
+    "answerable": true,
+    "generated_answer": "The two common strategies are:\n\n1. **Pre‑pruning** – stop growing the tree early (e.g., limit max depth, max leaves, or require a minimum number of samples per node).  \n2. **Post‑pruning** – build the full tree first, then prune away nodes that add little information.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q9",
+    "question": "What are one advantage and one disadvantage of decision trees?",
+    "answerable": true,
+    "generated_answer": "**Advantage:**  \nDecision trees produce models that are easy to visualize and understand—especially for smaller trees—so non‑experts can interpret the decision‑making process.\n\n**Disadvantage:**  \nEven with pre‑pruning, decision trees tend to overfit the training data, which leads to poor generalization performance on new data.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 0.75,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q10",
+    "question": "How can a random forest reduce overfitting compared with a single decision tree?",
+    "answerable": true,
+    "generated_answer": "A random forest combats the over‑fitting that a single decision tree usually exhibits by **building many trees that are each a little different** and then **averaging their predictions**.\n\n* Each tree is trained on a **bootstrap sample** of the data (sampling with replacement), so the training set for each tree is slightly different.\n* At every split, the algorithm **randomly selects a subset of the features** (controlled by `max_features`) and chooses the best split only among those features. This further diversifies the trees.\n* Because the trees are forced to learn from different data points and different feature subsets, they tend to **overfit in different ways**.\n* When the forest makes a prediction, it **averages (or votes on) the predictions of all the trees**. The individual over‑fitting errors tend to cancel out, leaving a more robust, generalized model.\n\nThus, the combination of bootstrap sampling, random feature selection, and averaging reduces overfitting compared with relying on a single decision tree.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 0.75,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q11",
+    "question": "How does gradient boosting build an ensemble?",
+    "answerable": true,
+    "generated_answer": "Gradient boosting creates its ensemble **sequentially**.  \nIt starts with a simple weak learner (usually a very shallow decision tree).  \nThen, one by one, it adds more trees — each new tree is trained to **correct the errors made by the current ensemble** on the training data. The amount each tree is allowed to adjust the predictions is controlled by the **learning_rate**; a higher learning rate lets a tree make stronger corrections, while a lower rate requires more trees (higher n_estimators) to reach the same overall complexity. By repeatedly fitting these weak learners and aggregating their (scaled) predictions, gradient boosting builds a strong model that improves performance with each added tree.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 0.75,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q12",
+    "question": "How does the k-nearest neighbors algorithm make a prediction?",
+    "answerable": true,
+    "generated_answer": "The k‑nearest neighbors (k‑NN) algorithm predicts a new point by first locating the k training points that are closest to it (using a distance measure such as Euclidean distance).  \n\n* **Classification** – If k = 1, the prediction is simply the label of that single nearest neighbor. For larger k, the algorithm counts how many of the k neighbors belong to each class and assigns the class that appears most often (majority vote).  \n\n* **Regression** – The algorithm takes the k nearest neighbors and returns the average (or another aggregate) of their target values as the prediction.  \n\nIn all cases, the “closeness” of points is determined by the chosen distance metric, and the model itself is just the stored training data.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q13",
+    "question": "How does increasing the number of neighbors affect a k-nearest neighbors classifier?",
+    "answerable": true,
+    "generated_answer": "Increasing the number of neighbors makes the classifier rely on a broader set of nearby points instead of just the single closest one.  \n- **Smoother, more stable predictions** – the vote of several neighbors reduces the influence of any single training point.  \n- **Less exact fit to the training data** – because the decision is based on a group, the model no longer follows every nuance of the training set, which can improve generalization but may also lower accuracy on the training data.  \n\nIn short, more neighbors give a smoother, potentially more robust model, while fewer neighbors (e.g., 1) produce very “wiggly” predictions that match the training points closely.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q14",
+    "question": "Why can cross-validation be preferable to using a single training-validation split?",
+    "answerable": true,
+    "generated_answer": "Cross‑validation is often better than a single train‑test split because it gives a more reliable estimate of how a model will perform on new data.\n\n* **Reduces luck of a single split** – With one random split you might end up with only easy cases in the test set (inflating accuracy) or only hard cases (deflating accuracy). In k‑fold cross‑validation every example is used as test data once and as training data k – 1 times, so the model must generalize to the whole dataset.\n\n* **Shows sensitivity to the training set** – By looking at the scores from each fold you see the range of performance (e.g., 90 %–100 % on the iris data), which tells you how the model might behave in best‑ and worst‑case scenarios.\n\n* **Makes better use of the data** – Each fold trains on a larger portion of the data (e.g., 80 % with 5‑fold, 90 % with 10‑fold) compared with the typical 75 %/25 % split, and more training data usually leads to a more accurate model.\n\nTogether, these points mean cross‑validation provides a more stable, informative, and data‑efficient assessment of model generalization than a single training‑validation split. (The main trade‑off is higher computational cost.)",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  },
+  {
+    "id": "Q15",
+    "question": "What is the kernel trick in support vector machines?",
+    "answerable": true,
+    "generated_answer": "The kernel trick lets an SVM create a **more powerful, nonlinear decision boundary** by implicitly working in a higher‑dimensional feature space **without ever explicitly constructing that expanded representation**.  \n\nInstead of actually adding all the new polynomial or infinite‑dimensional features, the trick computes the **scalar products (inner products) between data points** as if they were mapped into the larger space. By using a kernel function—such as the polynomial kernel (which captures all polynomial combinations up to a given degree) or the radial basis function (RBF) kernel (which corresponds to an infinite‑dimensional space)—the SVM can evaluate these inner products directly.  \n\nThus, the kernel trick enables the model to benefit from the richer feature space while keeping the computation tractable.",
+    "retrieved_context_count": 5,
+    "faithfulness": 1.0,
+    "answer_accuracy": 1.0,
+    "abstention_correct": null,
+    "error": null
+  }
+]

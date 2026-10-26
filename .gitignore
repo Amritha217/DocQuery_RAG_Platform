@@ -9,3 +9,6 @@ vector_store/
 .idea/
 *.log
 node_modules/
+
+.pytest_cache/
+.ruff_cache/

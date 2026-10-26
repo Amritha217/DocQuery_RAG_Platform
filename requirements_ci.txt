@@ -1,0 +1,39 @@
+
+# FastAPI application
+fastapi
+uvicorn[standard]
+python-dotenv
+python-multipart
+aiofiles
+
+# Database
+sqlalchemy
+psycopg2-binary
+
+# Authentication and security
+passlib[bcrypt]
+bcrypt==4.0.1
+python-jose[cryptography]
+
+# Document processing
+pypdf
+python-docx
+pydantic[email]
+
+# Retrieval and embeddings
+sentence-transformers
+faiss-cpu
+numpy
+rank-bm25
+
+# LLM integration
+groq
+
+# Evaluation
+ragas
+openai
+
+# Testing and code quality
+pytest
+httpx
+ruff
