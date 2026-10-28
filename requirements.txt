@@ -35,4 +35,5 @@ groq
 
 ragas
 openai
+langchain-community
 

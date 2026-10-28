@@ -28,6 +28,7 @@ rank-bm25
 
 # LLM integration
 groq
+langchain-community
 
 # Evaluation
 ragas
