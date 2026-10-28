@@ -10,9 +10,9 @@ import math
 from pathlib import Path
 
 from app.services.retrieval_service import (
-    search_faiss,
     hybrid_search,
     rerank_results,
+    search_faiss,
 )
 
 ROOT_DIR = Path(__file__).resolve().parent.parent

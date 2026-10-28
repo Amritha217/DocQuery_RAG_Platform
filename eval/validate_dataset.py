@@ -78,7 +78,7 @@ def validate_dataset():
         # Ensures the field answerable is boolean else raise error
 
         if not isinstance(item["answerable"], bool):
-            raise ValueError(f"{location}: answerable must be true or false.")
+            raise TypeError(f"{location}: answerable must be true or false.")
 
 
         # Validate the relevant passages
@@ -87,7 +87,7 @@ def validate_dataset():
         passages = item["relevant_passages"]
 
         if not isinstance(passages, list):
-            raise ValueError(f"{location}: relevant_passages must be a list.")
+            raise TypeError(f"{location}: relevant_passages must be a list.")
 
         if any(not isinstance(p, str) or not p.strip() for p in passages):
             raise ValueError(f"{location}: passages must be non-empty strings.")

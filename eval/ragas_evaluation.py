@@ -11,12 +11,11 @@ from pathlib import Path
 
 from openai import AsyncOpenAI
 from ragas.llms import llm_factory
-from ragas.metrics.collections import Faithfulness, AnswerAccuracy
+from ragas.metrics.collections import AnswerAccuracy, Faithfulness
 
-from app.config import GROQ_API_KEY, GROQ_MODEL, GROQ_JUDGE_MODEL
-from app.services.retrieval_service import hybrid_search, rerank_results
+from app.config import GROQ_API_KEY, GROQ_JUDGE_MODEL, GROQ_MODEL
 from app.services.llm_service import generate_answer
-
+from app.services.retrieval_service import hybrid_search, rerank_results
 
 # Ouput of this file is stored as eval/ragas_results.json
 
@@ -155,7 +154,7 @@ async def main():
             else:
                 row["abstention_correct"] = is_abstention(answer)
 
-        except Exception as exc:
+        except (ValueError, TypeError) as exc:
             row["error"] = str(exc)
             print(f"Error: {exc}")
 
